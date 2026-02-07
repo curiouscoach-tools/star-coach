@@ -43,12 +43,11 @@ export default function ChatPanel({
   };
 
   const sectionLabels = {
-    intent: 'Understanding the problem',
-    outcome: 'Defining the outcome',
-    scope: 'Setting boundaries',
-    success: 'Success criteria',
-    constraints: 'Constraints & context',
-    complete: 'Ticket complete'
+    situation: 'Setting the scene',
+    task: 'Defining your role',
+    action: 'What you did',
+    result: 'The impact',
+    complete: 'STAR answer complete'
   };
 
   return (
@@ -57,9 +56,9 @@ export default function ChatPanel({
       <div className="px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Ticket Coach</h2>
+            <h2 className="text-lg font-semibold text-gray-800">Interview Coach</h2>
             <p className="text-sm text-gray-500">
-              {sectionLabels[currentSection] || 'Let\'s build a clear ticket together'}
+              {sectionLabels[currentSection] || 'Let\'s build a compelling STAR answer'}
             </p>
           </div>
           <button
@@ -77,8 +76,8 @@ export default function ChatPanel({
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            <p className="text-lg mb-2">Welcome to the Ticket Coach!</p>
-            <p className="text-sm">I'll help you create a clear, well-structured ticket through a short conversation.</p>
+            <p className="text-lg mb-2">Welcome to STAR Coach!</p>
+            <p className="text-sm">I'll help you prepare compelling interview answers through a short conversation.</p>
           </div>
         )}
 

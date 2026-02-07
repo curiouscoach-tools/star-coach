@@ -3,15 +3,13 @@ import { useState, useCallback, useRef } from 'react';
 const INITIAL_MESSAGE = {
   id: 'initial',
   role: 'assistant',
-  content: `Hi! I'm here to help you create a clear, well-structured ticket.
+  content: `Hi! I'm here to help you prepare compelling STAR answers for your interview.
 
-Let's start with the most important question:
+**What competency or skill are you preparing to discuss?**
 
-**What problem are we trying to solve, or what opportunity are we pursuing?**
-
-Tell me about the issue or need that's driving this work.`,
+For example: leadership, problem-solving, stakeholder management, delivering under pressure, etc.`,
   timestamp: new Date().toISOString(),
-  section: 'intent',
+  section: 'situation',
   isStreaming: false
 };
 
@@ -25,33 +23,33 @@ function toApiMessages(msgs) {
 
 // Derive section from which fields are actually populated.
 // This is the ground truth — if the data is there, the section should advance.
-const SECTION_ORDER = ['intent', 'outcome', 'scope', 'success', 'constraints', 'complete'];
+const SECTION_ORDER = ['situation', 'task', 'action', 'result', 'complete'];
 
 function deriveSectionFromData(updates) {
-  if (!updates) return 'intent';
-  const hasIntent = updates.intent != null;
-  const hasOutcome = updates.outcome != null;
-  const hasScope = updates.scope != null;
-  const hasSuccess = Array.isArray(updates.successCriteria) && updates.successCriteria.length > 0;
+  if (!updates) return 'situation';
+  const hasSituation = updates.situation != null && updates.situation.trim() !== '';
+  const hasTask = updates.task != null && updates.task.trim() !== '';
+  const hasAction = updates.action != null && updates.action.trim() !== '';
+  const hasResult = updates.result != null && updates.result.trim() !== '';
 
-  if (hasIntent && hasOutcome && hasScope && hasSuccess) return 'complete';
-  if (hasIntent && hasOutcome && hasScope) return 'success';
-  if (hasIntent && hasOutcome) return 'scope';
-  if (hasIntent) return 'outcome';
-  return 'intent';
+  if (hasSituation && hasTask && hasAction && hasResult) return 'complete';
+  if (hasSituation && hasTask && hasAction) return 'result';
+  if (hasSituation && hasTask) return 'action';
+  if (hasSituation) return 'task';
+  return 'situation';
 }
 
 function furthestSection(a, b) {
   return SECTION_ORDER.indexOf(a) >= SECTION_ORDER.indexOf(b) ? a : b;
 }
 
-export function useCoachConversation(onTicketUpdate) {
+export function useCoachConversation(onStarUpdate) {
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
-  const [currentSection, setCurrentSection] = useState('intent');
-  const currentSectionRef = useRef('intent');
+  const [currentSection, setCurrentSection] = useState('situation');
+  const currentSectionRef = useRef('situation');
 
   const runExtraction = useCallback(async (conversationMessages) => {
     try {
@@ -74,13 +72,13 @@ export function useCoachConversation(onTicketUpdate) {
 
       const data = await response.json();
 
-      if (data.ticketUpdates && onTicketUpdate) {
-        onTicketUpdate(data.ticketUpdates);
+      if (data.starUpdates && onStarUpdate) {
+        onStarUpdate(data.starUpdates);
       }
 
       // Advance section based on whichever is further ahead:
       // the extractor's suggestion or what the data actually shows.
-      const dataSection = deriveSectionFromData(data.ticketUpdates);
+      const dataSection = deriveSectionFromData(data.starUpdates);
       const apiSection = data.suggestedSection || currentSectionRef.current;
       const nextSection = furthestSection(dataSection, apiSection);
 
@@ -89,7 +87,7 @@ export function useCoachConversation(onTicketUpdate) {
     } catch (err) {
       console.error('Extraction error (non-fatal):', err);
     }
-  }, [onTicketUpdate]);
+  }, [onStarUpdate]);
 
   const sendMessage = useCallback(async (content) => {
     const userMessage = {
@@ -201,8 +199,8 @@ export function useCoachConversation(onTicketUpdate) {
       id: `initial-${Date.now()}`,
       timestamp: new Date().toISOString()
     }]);
-    currentSectionRef.current = 'intent';
-    setCurrentSection('intent');
+    currentSectionRef.current = 'situation';
+    setCurrentSection('situation');
     setIsStreaming(false);
     setIsLoading(false);
     setError(null);

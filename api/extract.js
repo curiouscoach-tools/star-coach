@@ -1,4 +1,4 @@
-// Vercel Serverless Function for ticket data extraction
+// Vercel Serverless Function for STAR answer extraction
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,47 +22,48 @@ export default async function handler(req, res) {
   try {
     const { messages, currentSection } = req.body;
 
-    const systemPrompt = `Extract Jira ticket fields from a coaching conversation. You receive the FULL conversation each time. Populate as many fields as possible, as early as possible. A rough extraction now is better than a perfect one later — you get the full conversation again next turn to refine.
+    const systemPrompt = `Extract STAR interview answer components from a coaching conversation. You receive the FULL conversation each time. Populate as many fields as possible, as early as possible. A rough extraction now is better than a perfect one later — you get the full conversation again next turn to refine.
 
 FIELDS:
-- intent: 1-3 sentences. Why this work matters, who is affected.
-- outcome: 1-3 sentences. What will be different when done. Impact, not tasks.
-- scope: { "included": ["..."], "excluded": ["..."] }. What's in and out.
-- successCriteria: ["..."]. How we'll know it worked. Concrete statements.
-- constraints: ["..."]. Deadlines, dependencies, technical limits. [] if none mentioned.
+- situation: 1-3 sentences. The specific context — when, where, what was the challenge or opportunity. Include enough detail for the interviewer to understand the stakes.
+- task: 1-2 sentences. The candidate's SPECIFIC responsibility or accountability. What were THEY supposed to do? Not the team — them.
+- action: 2-4 sentences. The concrete steps the candidate personally took. Use "I" not "we". Be specific about their individual contribution.
+- result: 1-3 sentences. The measurable outcome and business impact. Include numbers, percentages, or concrete improvements where possible.
+- competency: The skill or competency this story demonstrates (e.g., "leadership", "problem-solving", "stakeholder management").
 
 RULES:
 - Extract from hints and implications, not just explicit statements.
-- If the problem implies a solution, extract outcome. If the user names specific areas, extract scope.
-- Infer successCriteria from any numbers, metrics, or concrete descriptions of "done."
+- Write in first person ("I") as if the candidate would say it in an interview.
+- Polish the language slightly — make it interview-ready, not a transcript.
+- Keep each section concise and impactful.
 - null means genuinely ZERO signal anywhere in the conversation — not even a hint.
 
-suggestedSection: next section that needs MORE information.
-intent → outcome → scope → success → constraints → complete.
-"complete" when intent + outcome + scope + success all have content.
+suggestedSection: next STAR element that needs MORE information.
+situation → task → action → result → complete.
+"complete" when all four STAR elements have content.
 
-EXAMPLE 1 — After 1 user message:
+EXAMPLE 1 — After 2 exchanges:
 
-User: "Customers want push notifications on mobile. They only get email alerts and they're missing time-sensitive approvals."
+User: "I want to prepare something about leadership."
+Coach: "Tell me about a specific time you led a team through a challenge."
+User: "At my last company, our enterprise dashboard was losing customers because it took 8+ seconds to load. I was the tech lead responsible for fixing it."
 
-{"ticketUpdates":{"intent":"Customers only receive email alerts and are missing time-sensitive approvals that need quick action.","outcome":"Users receive push notifications on mobile for time-sensitive items so approvals aren't missed.","scope":{"included":["Mobile push notifications","Time-sensitive approval alerts"],"excluded":[]},"successCriteria":null,"constraints":null},"suggestedSection":"success","isComplete":false}
+{"starUpdates":{"situation":"As tech lead at my previous company, our enterprise dashboard was experiencing severe performance issues — page loads took over 8 seconds, and we were losing customers as a result.","task":"I was responsible for diagnosing the root cause and leading the technical solution.","action":null,"result":null,"competency":"leadership"},"suggestedSection":"action","isComplete":false}
 
-Intent is explicit. Outcome is implied — push notifications solve missed approvals. Scope is implied — mobile push for approvals. 3 fields from 1 message.
+Situation and Task are clear. Action not yet discussed.
 
-EXAMPLE 2 — After 3 exchanges:
+EXAMPLE 2 — After 4 exchanges with full STAR:
 
-User: "Dashboard search takes 8+ seconds. Enterprise users complain weekly."
-Coach: "When this is fixed, what should search feel like?"
-User: "1-2 second response times. Should also reduce error logs and support tickets."
-Coach: "What's in scope for this pass?"
-User: "Give the devs free rein."
+User: "I analyzed query logs, found an N+1 problem, built a proof-of-concept, and presented the business case to leadership. Got approval in one meeting."
+Coach: "What was the measurable impact?"
+User: "Query time dropped from 8 seconds to 400ms. Customer complaints about performance dropped 60% in the first month."
 
-{"ticketUpdates":{"intent":"Dashboard search takes 8+ seconds, causing weekly complaints from enterprise users.","outcome":"Search returns results in 1-2 seconds. Error logs and support ticket volume decrease.","scope":{"included":["All dashboard search infrastructure"],"excluded":[]},"successCriteria":["Search response time under 2 seconds","Reduction in search-related error logs","Fewer support tickets about search performance"],"constraints":null},"suggestedSection":"constraints","isComplete":false}
+{"starUpdates":{"situation":"As tech lead at my previous company, our enterprise dashboard was experiencing severe performance issues — page loads took over 8 seconds, and we were losing customers as a result.","task":"I was responsible for diagnosing the root cause and leading the technical solution to recover customer trust.","action":"I analyzed query logs and identified an N+1 database problem as the root cause. I built a proof-of-concept fix and presented the business case to leadership, securing approval in a single meeting.","result":"Query response time improved from 8 seconds to 400ms — a 95% reduction. Customer complaints about performance dropped 60% within the first month.","competency":"leadership"},"suggestedSection":"complete","isComplete":true}
 
-successCriteria inferred from the outcome answer — "1-2 seconds", "reduce error logs", "reduce support tickets" are concrete enough to extract as criteria immediately.
+All STAR elements complete with concrete, interview-ready language.
 
 Respond with ONLY a JSON object. No markdown, no backticks.
-{"ticketUpdates":{"intent":"...or null","outcome":"...or null","scope":"...or null","successCriteria":"...or null","constraints":"...or null"},"suggestedSection":"...","isComplete":false}`;
+{"starUpdates":{"situation":"...or null","task":"...or null","action":"...or null","result":"...or null","competency":"...or null"},"suggestedSection":"...","isComplete":false}`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -73,7 +74,7 @@ Respond with ONLY a JSON object. No markdown, no backticks.
       },
       body: JSON.stringify({
         model: 'claude-3-5-haiku-20241022',
-        max_tokens: 512,
+        max_tokens: 768,
         temperature: 0,
         system: systemPrompt,
         messages: messages
@@ -106,7 +107,7 @@ Respond with ONLY a JSON object. No markdown, no backticks.
     } catch (parseError) {
       console.error('Failed to parse extraction response:', cleanedText);
       parsedResponse = {
-        ticketUpdates: null,
+        starUpdates: null,
         suggestedSection: currentSection,
         isComplete: false
       };

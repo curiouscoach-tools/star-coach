@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, ClipboardCheck } from 'lucide-react';
+import React, { useEffect } from 'react';
 import CoachView from './components/coach/CoachView';
-import ClassicView from './components/classic/ClassicView';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('coach');
-
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   return (
@@ -23,34 +19,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Tab Navigation */}
-            <nav className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setActiveTab('coach')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === 'coach'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                Coach
-              </button>
-              <button
-                onClick={() => setActiveTab('classic')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === 'classic'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <ClipboardCheck className="w-4 h-4" />
-                Classic
-              </button>
-            </nav>
-
-            <div className="h-6 w-px bg-gray-200" />
-
             <a
               href="https://github.com/curiouscoach-tools/star-coach"
               target="_blank"
@@ -80,7 +48,7 @@ export default function App() {
 
       {/* Main Content */}
       <main>
-        {activeTab === 'coach' ? <CoachView /> : <ClassicView />}
+        <CoachView />
       </main>
     </div>
   );

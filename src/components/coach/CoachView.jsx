@@ -1,11 +1,11 @@
 import React from 'react';
 import ChatPanel from './ChatPanel';
-import TicketPanel from './TicketPanel';
+import StarPanel from './StarPanel';
 import { useCoachConversation } from '../../hooks/useCoachConversation';
-import { useTicketBuilder } from '../../hooks/useTicketBuilder';
+import { useStarBuilder } from '../../hooks/useStarBuilder';
 
 export default function CoachView() {
-  const { ticket, updateTicket, resetTicket } = useTicketBuilder();
+  const { star, updateStar, resetStar } = useStarBuilder();
   const {
     messages,
     isLoading,
@@ -14,11 +14,11 @@ export default function CoachView() {
     sendMessage,
     resetConversation,
     currentSection
-  } = useCoachConversation(updateTicket);
+  } = useCoachConversation(updateStar);
 
   const handleReset = () => {
     resetConversation();
-    resetTicket();
+    resetStar();
   };
 
   return (
@@ -36,10 +36,10 @@ export default function CoachView() {
         />
       </div>
 
-      {/* Ticket Panel - Right Side */}
+      {/* STAR Panel - Right Side */}
       <div className="w-1/2 bg-gray-50">
-        <TicketPanel
-          ticket={ticket}
+        <StarPanel
+          star={star}
           currentSection={currentSection}
         />
       </div>
