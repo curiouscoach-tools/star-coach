@@ -13,11 +13,14 @@ export default function App() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <img
-            src="/images/jironaut-logo.png"
-            alt="The Jironaut — Charting the stars of Jira"
-            className="h-[4.8rem] w-auto"
-          />
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/curious_coach_tools_logo.png"
+              alt="STAR Coach"
+              className="h-12 w-auto"
+            />
+            <span className="text-xl font-semibold text-gray-800">STAR Coach</span>
+          </div>
 
           <div className="flex items-center gap-4">
             {/* Tab Navigation */}
@@ -49,7 +52,7 @@ export default function App() {
             <div className="h-6 w-px bg-gray-200" />
 
             <a
-              href="https://github.com/IanSimon23/jironaut"
+              href="https://github.com/curiouscoach-tools/star-coach"
               target="_blank"
               rel="noopener noreferrer"
               title="View on GitHub"
