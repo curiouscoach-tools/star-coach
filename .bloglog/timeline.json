@@ -18,6 +18,19 @@
       "timestamp": "2026-02-08T07:43:09.273Z",
       "type": "win",
       "content": "Job description analysis flow - paste JD, extract competencies, guided STAR coaching per competency, session persistence, export all answers"
+    },
+    {
+      "id": "66ecfb77-3826-4d49-bbaf-deec3ca8e5ce",
+      "timestamp": "2026-02-08T07:47:21.535Z",
+      "type": "commit",
+      "message": "Add job description analysis flow with competency extraction and session management",
+      "gitHash": "afcbcb6f4af906a3b5cd35b555d84133d165303d"
+    },
+    {
+      "id": "89eca465-605d-48e1-9e6f-f1d41619254c",
+      "timestamp": "2026-02-08T08:43:04.976Z",
+      "type": "win",
+      "content": "File upload support for job descriptions - drag & drop .txt, .docx, .pdf, .pptx with client-side and Claude API extraction"
     }
   ]
 }
