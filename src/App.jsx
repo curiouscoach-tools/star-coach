@@ -1,8 +1,113 @@
 import React, { useEffect } from 'react';
+import { useInterviewSession } from './hooks/useInterviewSession';
+import JobInput from './components/JobInput';
+import CompetencyReview from './components/CompetencyReview';
 import CoachView from './components/coach/CoachView';
+import SessionProgress from './components/SessionProgress';
+import ExportPanel from './components/ExportPanel';
 
 export default function App() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  const {
+    session,
+    isAnalyzing,
+    error,
+    currentCompetency,
+    progress,
+    analyzeJobDescription,
+    toggleCompetency,
+    selectAllCompetencies,
+    deselectAllCompetencies,
+    startCoaching,
+    startWithCompetency,
+    completeCurrentCompetency,
+    goToNextCompetency,
+    goToPreviousCompetency,
+    goToCompetencyList,
+    goToExport,
+    resetSession,
+    restartFromInput,
+    getAnswerForCompetency
+  } = useInterviewSession();
+
+  const renderContent = () => {
+    switch (session.sessionPhase) {
+      case 'input':
+        return (
+          <JobInput
+            onAnalyze={analyzeJobDescription}
+            isAnalyzing={isAnalyzing}
+            error={error}
+          />
+        );
+
+      case 'review':
+        return (
+          <CompetencyReview
+            jobTitle={session.jobTitle}
+            competencies={session.competencies}
+            selectedCompetencies={session.selectedCompetencies}
+            completedAnswers={session.completedAnswers}
+            onToggle={toggleCompetency}
+            onSelectAll={selectAllCompetencies}
+            onDeselectAll={deselectAllCompetencies}
+            onStartCoaching={startCoaching}
+            onStartWithCompetency={startWithCompetency}
+            onRestart={restartFromInput}
+          />
+        );
+
+      case 'coaching':
+        const currentAnswer = currentCompetency
+          ? getAnswerForCompetency(currentCompetency.id)
+          : null;
+
+        return (
+          <>
+            <SessionProgress
+              current={progress.current}
+              total={progress.total}
+              competencyName={currentCompetency?.name || ''}
+              isComplete={!!currentAnswer}
+              onPrevious={goToPreviousCompetency}
+              onNext={goToNextCompetency}
+              onBackToList={goToCompetencyList}
+              onExport={goToExport}
+              canGoNext={progress.current < progress.total}
+              canGoPrevious={progress.current > 1}
+            />
+            <CoachView
+              competency={currentCompetency}
+              jobDescription={session.jobDescription}
+              jobTitle={session.jobTitle}
+              existingAnswer={currentAnswer}
+              onComplete={completeCurrentCompetency}
+              onSkip={goToNextCompetency}
+            />
+          </>
+        );
+
+      case 'complete':
+        return (
+          <ExportPanel
+            jobTitle={session.jobTitle}
+            completedAnswers={session.completedAnswers}
+            onBackToList={goToCompetencyList}
+            onRestart={restartFromInput}
+          />
+        );
+
+      default:
+        return (
+          <JobInput
+            onAnalyze={analyzeJobDescription}
+            isAnalyzing={isAnalyzing}
+            error={error}
+          />
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -48,7 +153,7 @@ export default function App() {
 
       {/* Main Content */}
       <main>
-        <CoachView />
+        {renderContent()}
       </main>
     </div>
   );

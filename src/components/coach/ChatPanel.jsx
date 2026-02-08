@@ -9,7 +9,8 @@ export default function ChatPanel({
   error,
   onSendMessage,
   onReset,
-  currentSection
+  currentSection,
+  competencyName
 }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
@@ -56,7 +57,9 @@ export default function ChatPanel({
       <div className="px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Interview Coach</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              {competencyName ? `Preparing: ${competencyName}` : 'Interview Coach'}
+            </h2>
             <p className="text-sm text-gray-500">
               {sectionLabels[currentSection] || 'Let\'s build a compelling STAR answer'}
             </p>

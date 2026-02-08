@@ -5,6 +5,19 @@
       "timestamp": "2026-02-07T22:23:09.381Z",
       "type": "win",
       "content": "Initialized fork from Jironaut, completed basic rebranding"
+    },
+    {
+      "id": "223e1c60-1965-457b-8597-829c61aea1bb",
+      "timestamp": "2026-02-07T22:29:18.447Z",
+      "type": "commit",
+      "message": "Transform from Jironaut ticket coach to STAR interview coach",
+      "gitHash": "d5a9669715ca92d552dae7bf45d1e988bfaea453"
+    },
+    {
+      "id": "0b11c464-d140-4cc2-b8a8-111f3702dd7b",
+      "timestamp": "2026-02-08T07:43:09.273Z",
+      "type": "win",
+      "content": "Job description analysis flow - paste JD, extract competencies, guided STAR coaching per competency, session persistence, export all answers"
     }
   ]
 }

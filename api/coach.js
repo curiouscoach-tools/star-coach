@@ -64,8 +64,30 @@ User: "We reduced outage time by 40%."
 You: "What specifically did you do to achieve that reduction?"
 WRONG. They already explained actions. Accept result and wrap up.`;
 
-function buildSystemPrompt(currentSection) {
-  return COACHING_SYSTEM_PROMPT + `\n\nSections covered so far: up to "${currentSection}". Read the conversation carefully — ask about the NEXT STAR element that hasn't been clearly answered yet. Do not re-ask anything already covered.`;
+function buildSystemPrompt(currentSection, competency, jobDescription, jobTitle) {
+  let prompt = COACHING_SYSTEM_PROMPT;
+
+  // Add context about the specific competency and role
+  if (competency || jobTitle) {
+    prompt += `\n\nCONTEXT:`;
+    if (jobTitle) {
+      prompt += `\n- Role: ${jobTitle}`;
+    }
+    if (competency) {
+      prompt += `\n- Competency being assessed: ${competency.name}`;
+      if (competency.description) {
+        prompt += ` (${competency.description})`;
+      }
+      if (competency.sampleQuestion) {
+        prompt += `\n- Interview question: "${competency.sampleQuestion}"`;
+      }
+    }
+    prompt += `\n\nTailor your coaching to help the candidate demonstrate this specific competency effectively for this role.`;
+  }
+
+  prompt += `\n\nSections covered so far: up to "${currentSection}". Read the conversation carefully — ask about the NEXT STAR element that hasn't been clearly answered yet. Do not re-ask anything already covered.`;
+
+  return prompt;
 }
 
 export default async function handler(req, res) {
@@ -90,7 +112,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages, currentSection } = req.body;
+    const { messages, currentSection, competency, jobDescription, jobTitle } = req.body;
 
     const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -104,7 +126,7 @@ export default async function handler(req, res) {
         max_tokens: 1024,
         temperature: 0.7,
         stream: true,
-        system: buildSystemPrompt(currentSection),
+        system: buildSystemPrompt(currentSection, competency, jobDescription, jobTitle),
         messages: messages,
       }),
     });

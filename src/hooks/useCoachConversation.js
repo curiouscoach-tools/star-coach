@@ -1,17 +1,35 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 
-const INITIAL_MESSAGE = {
-  id: 'initial',
-  role: 'assistant',
-  content: `Hi! I'm here to help you prepare compelling STAR answers for your interview.
+function buildInitialMessage(competency, jobTitle) {
+  if (competency) {
+    return {
+      id: 'initial',
+      role: 'assistant',
+      content: `Let's prepare a STAR answer for **${competency.name}**${jobTitle ? ` for the ${jobTitle} role` : ''}.
+
+"${competency.sampleQuestion}"
+
+**Think of a specific example from your experience that demonstrates this competency.** What's the situation you'd like to talk about?`,
+      timestamp: new Date().toISOString(),
+      section: 'situation',
+      isStreaming: false
+    };
+  }
+
+  // Fallback for non-session mode (shouldn't happen with new flow)
+  return {
+    id: 'initial',
+    role: 'assistant',
+    content: `Hi! I'm here to help you prepare compelling STAR answers for your interview.
 
 **What competency or skill are you preparing to discuss?**
 
 For example: leadership, problem-solving, stakeholder management, delivering under pressure, etc.`,
-  timestamp: new Date().toISOString(),
-  section: 'situation',
-  isStreaming: false
-};
+    timestamp: new Date().toISOString(),
+    section: 'situation',
+    isStreaming: false
+  };
+}
 
 // Build API-safe messages array: must start with user role, roles must alternate.
 // Strips the initial UI greeting since it's not part of the real conversation.
@@ -43,13 +61,22 @@ function furthestSection(a, b) {
   return SECTION_ORDER.indexOf(a) >= SECTION_ORDER.indexOf(b) ? a : b;
 }
 
-export function useCoachConversation(onStarUpdate) {
-  const [messages, setMessages] = useState([INITIAL_MESSAGE]);
+export function useCoachConversation(onStarUpdate, competency = null, jobDescription = '', jobTitle = '') {
+  const initialMessage = useMemo(
+    () => buildInitialMessage(competency, jobTitle),
+    [competency?.id, jobTitle]
+  );
+
+  const [messages, setMessages] = useState([initialMessage]);
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
   const [currentSection, setCurrentSection] = useState('situation');
   const currentSectionRef = useRef('situation');
+
+  // Store context for API calls
+  const contextRef = useRef({ competency, jobDescription, jobTitle });
+  contextRef.current = { competency, jobDescription, jobTitle };
 
   const runExtraction = useCallback(async (conversationMessages) => {
     try {
@@ -60,7 +87,9 @@ export function useCoachConversation(onStarUpdate) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: apiMessages,
-          currentSection: currentSectionRef.current
+          currentSection: currentSectionRef.current,
+          competency: contextRef.current.competency,
+          jobDescription: contextRef.current.jobDescription
         })
       });
 
@@ -123,7 +152,10 @@ export function useCoachConversation(onStarUpdate) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: conversationHistory,
-          currentSection: currentSectionRef.current
+          currentSection: currentSectionRef.current,
+          competency: contextRef.current.competency,
+          jobDescription: contextRef.current.jobDescription,
+          jobTitle: contextRef.current.jobTitle
         })
       });
 
@@ -194,8 +226,12 @@ export function useCoachConversation(onStarUpdate) {
   }, [messages, runExtraction]);
 
   const resetConversation = useCallback(() => {
+    const newInitialMessage = buildInitialMessage(
+      contextRef.current.competency,
+      contextRef.current.jobTitle
+    );
     setMessages([{
-      ...INITIAL_MESSAGE,
+      ...newInitialMessage,
       id: `initial-${Date.now()}`,
       timestamp: new Date().toISOString()
     }]);
