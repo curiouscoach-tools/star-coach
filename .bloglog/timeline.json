@@ -31,6 +31,19 @@
       "timestamp": "2026-02-08T08:43:04.976Z",
       "type": "win",
       "content": "File upload support for job descriptions - drag & drop .txt, .docx, .pdf, .pptx with client-side and Claude API extraction"
+    },
+    {
+      "id": "fc949cd5-c2a0-41a3-af6a-665641b1622b",
+      "timestamp": "2026-02-08T08:43:40.424Z",
+      "type": "commit",
+      "message": "Add file upload support for job descriptions (.txt, .docx, .pdf, .pptx) and update header logo",
+      "gitHash": "719a02b7a5a30f44d48dfa8d4c75b71e6e17c531"
+    },
+    {
+      "id": "dbd033d5-40f8-4e73-841b-22b48b61d562",
+      "timestamp": "2026-02-08T08:50:00.229Z",
+      "type": "win",
+      "content": "README and repo setup for GitHub"
     }
   ]
 }
