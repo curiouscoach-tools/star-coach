@@ -2,6 +2,8 @@
 
 AI-powered interview preparation tool that helps candidates develop compelling STAR (Situation, Task, Action, Result) answers for behavioral interviews.
 
+**Live:** https://star-coach.curiouscoach.tools
+
 ## What It Does
 
 1. **Upload a job description** - Paste text or upload .txt, .docx, .pdf, or .pptx files
@@ -105,6 +107,10 @@ star-coach/
 │       └── documentParser.js       # Client-side doc parsing
 └── public/
 ```
+
+## Use Without the App
+
+Want the STAR coaching experience in your own AI setup? See [`STAR_COACH.md`](./STAR_COACH.md) — a standalone prompt you can add to Claude Projects (or similar). Upload your CV alongside job descriptions for personalized coaching that draws on your full background.
 
 ## License
 
