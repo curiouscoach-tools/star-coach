@@ -44,6 +44,19 @@
       "timestamp": "2026-02-08T08:50:00.229Z",
       "type": "win",
       "content": "README and repo setup for GitHub"
+    },
+    {
+      "id": "48c7139d-cd98-4c05-9109-37ccff0f07ab",
+      "timestamp": "2026-02-08T08:50:21.438Z",
+      "type": "commit",
+      "message": "Add README and environment setup docs",
+      "gitHash": "86d5329b513b18d96ea885d1ab7afafae53f967a"
+    },
+    {
+      "id": "19bb1506-4b48-4147-91fc-064fdda183a9",
+      "timestamp": "2026-02-08T09:17:02.470Z",
+      "type": "win",
+      "content": "Standalone STAR_COACH.md prompt for use in AI projects - recreates full coaching experience with CV integration and user context"
     }
   ]
 }
